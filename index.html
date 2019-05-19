@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>BREAKOUT GAME</title>
+	<style>
+		*{padding: 0; margin: 0;}
+		canvas{background: #eee; display: block; margin: 0 auto; auto;} 
+	</style>
+</head>
+        <style type="text/css">
+            canvas {
+                border:2px solid black;
+				background:lightgrey;
+            }
+        </style>
+<body>
+	<canvas id="Mycanvas" width="600" height="500"></canvas>
+
+	<script>
+		var canvas = document.getElementById("Mycanvas"); 
+		var contxt = canvas.getContext("2d");
+		var x = canvas.width-390	;
+		var y = canvas.height-(Math.random()*30+50);
+		var dx = 2;
+		var dy = -3;
+		var right = false;
+		var left = false;
+		var up = false;
+		var down = false;
+		var paddleHeight = 5;
+		var paddleWidth = 80;
+		var paddleX = (canvas.width-paddleWidth) / 2;
+		var paddleY = (canvas.height-30);
+		var ballRadius=10;
+		var color= "#0000ff";
+		var obstacle="";
+		obstacle = { x:0, y:0}
+		var colors=["#FF0000","#0000FF","#00FF00","#800080","#FFFF00","#000000"];
+		var scores=[20,40,80,60,50];
+		var score=0;
+		var win =0;
+		var bricks = [];
+		for(var c=0; c<5;c++)
+		{
+			bricks[c]= { x: 0, y: 0, status:1 };
+		}
+		
+		function drawBricks(){
+			if(bricks[0].status == 1) {
+			var brickX1 = 80;
+            var brickY1 = 40;
+            bricks[0].x = brickX1;
+            bricks[0].y = brickY1;
+            contxt.beginPath();
+            contxt.rect(brickX1, brickY1, 100, 25);
+            contxt.fillStyle = "#FF0000";
+            contxt.fill();
+            contxt.closePath();
+        	}
+        	if(bricks[1].status == 1) {
+        	   	var brickX2 = 240;
+            var brickY2 = 40;
+            bricks[1].x = brickX2;
+            bricks[1].y = brickY2;
+            contxt.beginPath();
+            contxt.rect(brickX2, brickY2, 100, 25);
+            contxt.fillStyle = "#0000FF";
+            contxt.fill();
+            contxt.closePath();
+        	}
+        	if(bricks[2].status == 1) {
+        	var brickX3 = 400;
+            var brickY3 = 40;
+            bricks[2].x = brickX3;
+            bricks[2].y = brickY3;
+            contxt.beginPath();
+            contxt.rect(brickX3, brickY3, 100, 25);
+            contxt.fillStyle = "#00FF00";
+            contxt.fill();
+            contxt.closePath();
+            }
+            if(bricks[3].status == 1) {
+            var brickX4 = 140;
+            var brickY4 = 100;
+            bricks[3].x = brickX4;
+            bricks[3].y = brickY4;
+            contxt.beginPath();
+            contxt.rect(brickX4, brickY4, 100, 25);
+            contxt.fillStyle = "#800080";
+            contxt.fill();
+            contxt.closePath();
+        }
+        if(bricks[4].status == 1) {
+             var brickX5 = 300;
+            var brickY5 = 100;
+            bricks[4].x = brickX5;
+            bricks[4].y = brickY5;
+            contxt.beginPath();
+            contxt.rect(brickX5, brickY5, 100, 25);
+            contxt.fillStyle = "#FFFF00";
+            contxt.fill();
+            contxt.closePath();
+        	}
+        var obstacleX = 135;
+        var obstacleY = 265;
+        obstacle.x = obstacleX;
+        obstacle.y= obstacleY;
+        contxt.beginPath();
+        contxt.rect(obstacleX, obstacleY, 160, 7);
+        contxt.fillStyle = "#000000";
+        contxt.fill();
+        contxt.closePath();
+		}
+
+		
+		function collision(){
+			if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
+				dx = -dx;
+    	}
+    	if(y + dy < ballRadius) {
+				dy = -dy;
+		}
+		if(y + dy > paddleY ) {
+   		if(x > paddleX && x < paddleX + paddleWidth ) {
+			dy = -dy;
+    	}
+    	}
+   		if(y+dy>canvas.height-20){
+			alert("SORRY! GAME OVER!");
+			document.location.reload();
+			clearInterval(interval);
+    	}
+    	  for(var r=0; r<5; r++) {
+            var b = bricks[r];
+             if(b.status == 1) {
+                if(x > b.x-10 && x < b.x+110 && y > b.y-15 && y < b.y+35) {
+                    dy = -dy;
+                    score +=scores[r];
+					color =colors[r]; 
+                    b.status = 0;
+                    
+					
+					
+                }
+                
+            }
+        }
+		var ob = obstacle;
+        	if(x > ob.x-5 && x < ob.x+155 && y > ob.y-10 && y < ob.y+20) {
+                dy = -dy;
+            }
+		}
+		function drawScore(){
+			contxt.font = "25px Arial";
+			contxt.fillStyle = "#0095DD";
+			contxt.fillText("Score: "+score, 8, 20);
+			if(score == 250){
+				
+				window.alert("CONGRATULATIONS!!! YOUR FINAL SCORE: "+ score); 
+				document.location.reload();
+				clearInterval(interval);
+						
+			}
+		}
+		function drawBall() {
+			contxt.beginPath();
+			contxt.arc(x, y, ballRadius, 0, Math.PI*2);
+			contxt.fillStyle = color;
+			contxt.fill();
+			contxt.closePath();
+		}
+		document.addEventListener("mousemove", mouseMoveHandler, false);
+
+		function mouseMoveHandler(e) {
+			var relativeX = e.clientX - canvas.offsetLeft;
+			if(relativeX > 0 && relativeX < canvas.width) {
+			paddleX = relativeX - paddleWidth/2;
+		}
+		}
+		function keyControls(){
+			if(right) {
+				if (paddleX < canvas.width-150){
+  		 		 	paddleX += 5;
+				}
+				else
+					paddleX ;
+				}
+			else if(left) {
+				if (paddleX > canvas.width-500) 
+ 					paddleX -= 5;
+ 				else
+ 					paddleX;
+				} 			
+		}			
+		function drawPaddle() {
+			contxt.beginPath();
+			contxt.rect(paddleX, paddleY, paddleWidth, paddleHeight);
+			contxt.fillStyle = "#0000ff";
+			contxt.fill();
+			contxt.closePath();
+		}	
+		
+		function draw() {
+			contxt.clearRect(0, 0, canvas.width, canvas.height);
+			drawBall();
+			drawPaddle();
+			drawBricks();
+			drawScore();
+			collision();
+			keyControls();
+			x += dx;
+			y += dy;
+		}
+		
+		var interval = setInterval(draw, 8);
+	</script>
+</body>
+
+</html>
